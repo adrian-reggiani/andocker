@@ -1,5 +1,4 @@
 import socket
-import keyboard
 import re
 
 def enviar_mensaje_udp(ip, puerto, mensaje):
@@ -23,22 +22,22 @@ def validar_ip_puerto(ip, puerto):
 
 def iniciar_escaneo_automatico(ip, puerto):
     validar_ip_puerto(ip, puerto)
-    print("Presiona 'ESC' para salir.")
+    print("Presiona 'ENTER' para enviar el código o 'ESC' para salir.")
     codigo = ""
+    
     while True:
         try:
-            event = keyboard.read_event()
-            if event.event_type == keyboard.KEY_DOWN:
-                if event.name == "enter":
-                    if codigo:  # Envía solo si hay un código capturado
-                        enviar_mensaje_udp(ip, puerto, codigo)
-                        print(f"Enviado: {codigo}")
-                    codigo = ""  # Reinicia el código para la próxima lectura
-                elif event.name == "esc":
-                    print("Finalizando programa.")
-                    break
-                elif re.match(r'^[\w\s-]$', event.name):  # Filtra caracteres válidos
-                    codigo += event.name
+            # Usamos input() para capturar la entrada del usuario
+            codigo = input("Escanea el código: ")  # Espera por una línea de entrada
+
+            if codigo.lower() == "salir":  # Detecta 'esc' como una entrada
+                print("Finalizando programa.")
+                break
+                
+            elif codigo:  # Verifica si la longitud del código es válida
+                enviar_mensaje_udp(ip, puerto, codigo)  # Envía el código
+                print(f"Enviado: {codigo}")
+            
         except Exception as e:
             mostrar_popup("Error de Lectura", str(e))
 
